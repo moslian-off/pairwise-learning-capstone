@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package federated;
+
+service FederatedService {
+  rpc Register(ClientInfo) returns (RegistrationResponse) {}
+  rpc GetGlobalModel(ModelRequest) returns (stream ModelChunk) {}  // 使用流式传输
+  rpc SubmitUpdate(stream ModelChunk) returns (UpdateResponse) {}  // 使用流式传输
+  rpc GetTrainingStatus(StatusRequest) returns (TrainingStatus) {}
+}
+
+message ClientInfo {
+  string client_id = 1;
+  int32 num_samples = 2;
+}
+
+message RegistrationResponse {
+  string message = 1;
+}
+
+message ModelRequest {
+  string client_id = 1;
+  int32 round = 2;
+}
+
+message ModelChunk {
+  bytes model_chunk = 1;
+  int32 chunk_id = 2;
+  int32 total_chunks = 3;
+  string client_id = 4;  // 用于上传时标识客户端
+  int32 round = 5;       // 用于标识轮次
+}
+
+message UpdateResponse {
+  string message = 1;
+}
+
+message StatusRequest {
+  string client_id = 1;
+}
+
+message TrainingStatus {
+  int32 current_round = 1;
+  bool training_complete = 2;
+}
